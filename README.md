@@ -38,16 +38,19 @@ Those headers let the WASM runtime use threads. `python -m http.server` does not
 
 `fetch_assets.py` can also save that Qwen file under `models/`. The page does not read that local copy. Commit `vendor/` and `models/minimind-3.q8.gguf`. Leave the Qwen file out of git.
 
-Context is fixed at 2048 tokens so the page does not allocate the models' full training cache.
+Context is 2048 tokens for MiniMind-3 and 4096 for Qwen, so the page does not allocate the models' full training cache. Qwen reserves that larger cache when it loads, about 850 MB.
 
 ## Chat
 
 - Tokens stream into the reply. Send becomes Stop while a reply is running.
 - Stop keeps a partial reply. A failed reply does not leave a dangling user turn.
-- Settings cover max tokens, temperature, repeat penalty, a system prompt, and Thinking.
+- Settings cover max tokens, temperature, repeat penalty, a system prompt, Thinking, and TTS.
+- TTS speaks a finished reply on this device. It is off until switched on. The first time it runs, the speech model (about 8.5 MB) downloads once and stays in the browser. Voice, speed, and audio output are in Settings.
+- MiniMind-3: about 65 MB. Qwen: 378 MB once, then about 850 MB. TTS off: nothing extra. TTS on: 8.5 MB once, then about 25 MB. CPU only while speaking.
 - The default system prompt is: "You are a helpful assistant. Answer clearly, stay accurate, and say when you are unsure."
 - Thinking opens the model's think channel (`enable_thinking` on Qwen3, `open_thinking` on MiniMind-3). It is off by default. The system prompt does not open that channel.
-- Clear starts a new transcript with the current system prompt.
+- Chats in the header lists conversations saved in this browser. Open one to continue it. Clear saves the current chat, then starts a new one. Clear all deletes every saved chat.
+- The context line shows how much of that model's window is used. At the limit, older messages stay on screen and the model sees only the newest part. Qwen replies can run to 2048 tokens, which leaves 2048 for the chat. MiniMind replies stay at 1024.
 
 ## Deploy
 

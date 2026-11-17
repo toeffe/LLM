@@ -4,18 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LLM</title>
+  <link rel="icon" href="./favicon.ico" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <header>
     <h1>LLM</h1>
     <div class="header-tools">
-      <label class="model-pick">
-        Model
-        <select id="model" disabled></select>
-      </label>
-      <span id="badge" class="size"></span>
+      <select id="model" disabled></select>
+      <span id="badge" class="size" hidden></span>
       <span class="status" id="status">Initializing…</span>
+      <div id="chatsAnchor" class="settings-anchor">
+        <button id="chatsToggle" class="text" type="button" aria-expanded="false" aria-controls="chatsPanel">Chats</button>
+        <div id="chatsPanel" class="settings" role="region" aria-label="Chats">
+          <div class="chat-actions">
+            <button id="newChat" class="text" type="button">New chat</button>
+            <button id="clearChats" class="text danger" type="button">Clear all</button>
+          </div>
+          <div id="chatList"></div>
+        </div>
+      </div>
       <div id="settingsAnchor" class="settings-anchor">
         <button id="settingsToggle" class="text" type="button" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
         <div id="settingsPanel" class="settings" role="region" aria-label="Settings">
@@ -34,6 +42,22 @@
             <input id="thinking" type="checkbox" />
             Thinking
           </label>
+          <label class="check">
+            <input id="tts" type="checkbox" />
+            TTS
+          </label>
+          <div class="speech-row">
+            <label class="field">Voice
+              <select id="ttsVoice"></select>
+            </label>
+            <label class="field">Speed
+              <input id="ttsSpeed" type="number" min="0.5" max="2" step="0.1" />
+            </label>
+          </div>
+          <label class="field">Output
+            <select id="ttsOutput"></select>
+          </label>
+          <p class="hint">8.5 MB once, then about 25 MB. CPU only while speaking.</p>
           <label class="field">System prompt
             <textarea id="systemPrompt" rows="4"></textarea>
           </label>
@@ -47,11 +71,13 @@
       <div class="progress-bar" id="progressBar"></div>
     </div>
   </header>
+  <p class="model-note" id="modelNote" hidden>For better results, change to Qwen.</p>
 
   <main>
     <div class="column">
       <div id="chat"></div>
       <div class="composer">
+        <p class="context" id="contextLabel">Context 0%</p>
         <div class="controls">
           <textarea id="input" placeholder="Message" rows="1" disabled></textarea>
           <button id="clear" class="text" disabled>Clear</button>
@@ -59,12 +85,6 @@
         </div>
         <p class="site">
           LLM.T-tek.dev
-          <span aria-hidden="true">·</span>
-          <a href="https://huggingface.co/unsloth/Qwen3-0.6B-GGUF" target="_blank" rel="noopener">Qwen3-0.6B</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://huggingface.co/jingyaogong/minimind-3-gguf" target="_blank" rel="noopener">MiniMind-3</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://github.com/ngxson/wllama" target="_blank" rel="noopener">wllama</a>
         </p>
       </div>
     </div>

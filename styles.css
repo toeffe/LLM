@@ -42,6 +42,16 @@ header {
   border-bottom: 1px solid var(--separator);
 }
 
+.model-note {
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--text);
+  background: var(--fill-solid);
+  border-bottom: 1px solid var(--separator);
+  padding: 0.5rem 1rem;
+}
+
 h1 {
   font-size: 1.25rem;
   font-weight: 650;
@@ -52,11 +62,13 @@ h1 {
 .header-tools {
   display: flex;
   align-items: center;
-  gap: 0.75rem 1rem;
+  gap: 0.35rem 0.6rem;
   flex-wrap: wrap;
   justify-content: flex-end;
   margin-left: auto;
 }
+
+#model { font-size: 0.8125rem; }
 
 .model-pick, .size, .status {
   font-size: 0.8125rem;
@@ -70,7 +82,6 @@ h1 {
 }
 
 .size { letter-spacing: 0.01em; }
-.status.ready { color: var(--ok); }
 .status.error { color: var(--danger); }
 
 select, input, textarea {
@@ -145,6 +156,30 @@ button.text:hover { color: var(--text); }
   transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
 }
 
+.chat-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+button.text.danger { color: var(--danger); }
+button.text.danger:hover { color: var(--text); }
+
+.chat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.chat-open {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .settings.is-open {
   opacity: 1;
   transform: none;
@@ -152,11 +187,14 @@ button.text:hover { color: var(--text); }
   visibility: visible;
 }
 
-.field-row {
+.field-row, .speech-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.6rem;
 }
+
+.field-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.speech-row { grid-template-columns: minmax(0, 1fr) 6.5rem; }
 
 .field {
   display: flex;
@@ -166,6 +204,8 @@ button.text:hover { color: var(--text); }
   letter-spacing: 0.01em;
   color: var(--muted);
 }
+
+.field select { width: 100%; }
 
 .check {
   display: flex;
@@ -295,6 +335,23 @@ main {
   width: 0%;
   background: var(--accent);
 }
+
+.hint {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.context {
+  margin: 0 0 0.4rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.context.warn { color: #ffd60a; }
+.context.full { color: var(--danger); }
 
 .site {
   margin-top: 0.45rem;
