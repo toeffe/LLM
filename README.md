@@ -1,10 +1,10 @@
 # LLM
 
-The page at LLM.T-tek.dev runs a chat model in the browser. The engine and the weights are files next to the page. The browser does not call a CDN.
+The page at LLM.T-tek.dev runs a chat model in the browser. MiniMind-3 ships with the page and is the model that loads first. Choosing Qwen downloads that file from Hugging Face once, into this browser.
 
 ## Quick start
 
-1. Download the runtime and both models once:
+1. The runtime and MiniMind-3 are already in the repo. To download a local copy of Qwen as well:
 
 ```bash
 python fetch_assets.py
@@ -33,10 +33,10 @@ Those headers let the WASM runtime use threads. `python -m http.server` does not
 | --- | --- |
 | `vendor/wllama/index.js` | wllama 3.13.0 |
 | `vendor/wllama/wllama.wasm` | llama.cpp WASM (~10.2 MB) |
-| `models/Qwen3-0.6B-Q4_K_M.gguf` | Default chat model, Qwen3 0.6B Q4 (~378 MB) |
-| `models/minimind-3.q8.gguf` | MiniMind-3 64M Q8 (~65 MB) |
+| `models/minimind-3.q8.gguf` | Default chat model, MiniMind-3 64M Q8 (~65 MB), committed |
+| Qwen3-0.6B-Q4_K_M.gguf | Optional model (~378 MB), downloaded from [unsloth/Qwen3-0.6B-GGUF](https://huggingface.co/unsloth/Qwen3-0.6B-GGUF) the first time it is selected |
 
-`fetch_assets.py` gets the Qwen file from [unsloth/Qwen3-0.6B-GGUF](https://huggingface.co/unsloth/Qwen3-0.6B-GGUF) and MiniMind-3 from [jingyaogong/minimind-3-gguf](https://huggingface.co/jingyaogong/minimind-3-gguf). Commit `vendor/`. Do not commit the GGUFs. Upload both folders together when you deploy.
+`fetch_assets.py` can also save that Qwen file under `models/`. The page does not read that local copy. Commit `vendor/` and `models/minimind-3.q8.gguf`. Leave the Qwen file out of git.
 
 Context is fixed at 2048 tokens so the page does not allocate the models' full training cache.
 
@@ -51,4 +51,4 @@ Context is fixed at 2048 tokens so the page does not allocate the models' full t
 
 ## Deploy
 
-Upload this folder, including `vendor/` and `models/`, to any static host that can send the two headers above.
+GitHub Pages can serve this repo, including MiniMind-3. It does not send the two headers above, so the browser uses one WASM thread there. A host that sends those headers can use more threads. Qwen is not part of the upload. The browser fetches it from Hugging Face.

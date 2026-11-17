@@ -5,20 +5,6 @@ const DEFAULT_SYSTEM =
 
 const MODELS = [
   {
-    id: "qwen3-0.6b",
-    label: "Qwen3 0.6B Q4",
-    url: "./models/Qwen3-0.6B-Q4_K_M.gguf",
-    badge: "0.6B · Q4",
-    sizeLabel: "~378 MB",
-    nCtx: 2048,
-    maxTokens: 1024,
-    temperature: 0.7,
-    topK: 20,
-    topP: 0.8,
-    repeatPenalty: 1.1,
-    thinkingKey: "enable_thinking",
-  },
-  {
     id: "minimind-3",
     label: "MiniMind-3 64M Q8",
     url: "./models/minimind-3.q8.gguf",
@@ -31,6 +17,20 @@ const MODELS = [
     topP: 0.9,
     repeatPenalty: 1.2,
     thinkingKey: "open_thinking",
+  },
+  {
+    id: "qwen3-0.6b",
+    label: "Qwen3 0.6B Q4",
+    url: "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
+    badge: "0.6B · Q4",
+    sizeLabel: "~378 MB",
+    nCtx: 2048,
+    maxTokens: 1024,
+    temperature: 0.7,
+    topK: 20,
+    topP: 0.8,
+    repeatPenalty: 1.1,
+    thinkingKey: "enable_thinking",
   },
 ];
 
@@ -189,7 +189,7 @@ function showIntro() {
   chatEl.innerHTML = "";
   addMessage(
     "system",
-    "LLM runs on this device. Nothing is sent to a server."
+    "Chat runs on this device. MiniMind-3 comes with this site. Other models download once."
   );
 }
 
