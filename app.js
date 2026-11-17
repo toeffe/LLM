@@ -189,7 +189,7 @@ function showIntro() {
   chatEl.innerHTML = "";
   addMessage(
     "system",
-    "Chat runs on this device. MiniMind-3 comes with this site. Other models download once."
+    "Chat runs on this device. Other models download once."
   );
 }
 
