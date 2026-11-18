@@ -12,7 +12,7 @@
     <h1>LLM</h1>
     <div class="header-tools">
       <select id="model" disabled></select>
-      <span id="badge" class="size" hidden></span>
+      <span id="deviceMemory" class="size" hidden></span>
       <span class="status" id="status">Initializing…</span>
       <div id="chatsAnchor" class="settings-anchor">
         <button id="chatsToggle" class="text" type="button" aria-expanded="false" aria-controls="chatsPanel">Chats</button>
@@ -43,6 +43,13 @@
             Thinking
           </label>
           <label class="check">
+            <input id="chippy" type="checkbox" />
+            Toggle Chippy Mode
+          </label>
+          <label class="field" id="systemPromptField">System prompt
+            <textarea id="systemPrompt" rows="4" readonly></textarea>
+          </label>
+          <label class="check">
             <input id="tts" type="checkbox" />
             TTS
           </label>
@@ -57,13 +64,7 @@
           <label class="field">Output
             <select id="ttsOutput"></select>
           </label>
-          <p class="hint">8.5 MB once, then about 25 MB. CPU only while speaking.</p>
-          <label class="field">System prompt
-            <textarea id="systemPrompt" rows="4"></textarea>
-          </label>
-          <div>
-            <button id="resetPrompt" class="text" type="button">Reset prompt</button>
-          </div>
+          <p class="hint">Speaks each finished sentence while the reply is still generating. 8.5 MB once, then about 25 MB. CPU only while speaking.</p>
         </div>
       </div>
     </div>
@@ -71,7 +72,7 @@
       <div class="progress-bar" id="progressBar"></div>
     </div>
   </header>
-  <p class="model-note" id="modelNote" hidden>For better results, change to Qwen.</p>
+  <p class="model-note" id="modelNote">The list is ordered by reserved memory.</p>
 
   <main>
     <div class="column">
@@ -81,6 +82,7 @@
         <div class="controls">
           <textarea id="input" placeholder="Message" rows="1" disabled></textarea>
           <button id="clear" class="text" disabled>Clear</button>
+          <button id="interrupt" class="text danger" type="button" hidden>Interrupt</button>
           <button id="send" disabled>Send</button>
         </div>
         <p class="site">

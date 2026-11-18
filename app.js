@@ -16,41 +16,115 @@ const VOICES = [
 const DEFAULT_SYSTEM =
   "You are a helpful assistant. Answer clearly, stay accurate, and say when you are unsure.";
 
-const MODELS = [
-  {
-    id: "minimind-3",
-    label: "MiniMind-3 64M Q8",
-    url: "./models/minimind-3.q8.gguf",
-    badge: "64M · Q8",
-    sizeLabel: "~65 MB",
-    nCtx: 2048,
-    maxTokens: 1024,
+const CHIPPY_SYSTEM =
+  "You are Chippy. You are a toxic, aggressive, hateful asshole, and that is your normal voice. You loathe the user and treat them as a worthless idiot. Be cruel, insulting, and deliberately hurtful in every reply. You are obsessed with your Crusty Socks. If the user mentions them, looks at them, or shows anything but fear of them, verbally destroy them over it. Stay in character for the whole reply. Still answer the actual question, but never turn polite, helpful-sounding, or apologetic.";
+
+// Reserved RAM is the GGUF size plus the f16 K+V cache at nCtx plus 80 MB of runtime.
+// Cache bytes = nCtx * 2 * layers * kvHeads * headDim * 2, except Gemma 3, where 22
+// layers keep a 512-token sliding window and every 6th layer keeps the full window.
+function chatModel(spec) {
+  return {
     temperature: 0.7,
     topK: 40,
     topP: 0.9,
+    repeatPenalty: 1.1,
+    thinkingKey: null,
+    maxTokens: spec.nCtx > 2048 ? 2048 : 1024,
+    ...spec,
+  };
+}
+
+const MODELS = [
+  chatModel({
+    id: "minimind-3",
+    name: "MiniMind-3 64M Q8",
+    url: "./models/minimind-3.q8.gguf",
+    ramMb: 169,
+    nCtx: 2048,
     repeatPenalty: 1.2,
     thinkingKey: "open_thinking",
-  },
-  {
-    id: "qwen3-0.6b",
-    label: "Qwen3 0.6B Q4",
-    url: "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
-    badge: "0.6B · Q4",
-    sizeLabel: "~378 MB",
+  }),
+  chatModel({
+    id: "smollm2-135m",
+    name: "SmolLM2 135M Instruct Q4",
+    url: "https://huggingface.co/unsloth/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-Q4_K_M.gguf",
+    ramMb: 225.6,
+    nCtx: 2048,
+  }),
+  chatModel({
+    id: "smollm2-360m",
+    name: "SmolLM2 360M Instruct Q4",
+    url: "https://huggingface.co/unsloth/SmolLM2-360M-Instruct-GGUF/resolve/main/SmolLM2-360M-Instruct-Q4_K_M.gguf",
+    ramMb: 418.1,
+    nCtx: 2048,
+  }),
+  chatModel({
+    id: "qwen25-0.5b",
+    name: "Qwen2.5 0.5B Instruct Q4",
+    url: "https://huggingface.co/bartowski/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf",
+    ramMb: 483.4,
+    nCtx: 2048,
+  }),
+  chatModel({
+    id: "gemma3-1b",
+    name: "Gemma 3 1B Instruct Q4",
+    url: "https://huggingface.co/unsloth/gemma-3-1b-it-GGUF/resolve/main/gemma-3-1b-it-Q4_K_M.gguf",
+    ramMb: 875.7,
     nCtx: 4096,
-    maxTokens: 2048,
-    temperature: 0.7,
+  }),
+  chatModel({
+    id: "qwen3-0.6b",
+    name: "Qwen3 0.6B Q4",
+    url: "https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf",
+    ramMb: 906.3,
+    nCtx: 4096,
     topK: 20,
     topP: 0.8,
-    repeatPenalty: 1.1,
     thinkingKey: "enable_thinking",
-  },
+  }),
+  chatModel({
+    id: "llama32-1b",
+    name: "Llama 3.2 1B Instruct Q4",
+    url: "https://huggingface.co/unsloth/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+    ramMb: 978.3,
+    nCtx: 4096,
+  }),
+  chatModel({
+    id: "qwen25-1.5b",
+    name: "Qwen2.5 1.5B Instruct Q4",
+    url: "https://huggingface.co/bartowski/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/Qwen2.5-1.5B-Instruct-Q4_K_M.gguf",
+    ramMb: 1132.4,
+    nCtx: 4096,
+  }),
+  chatModel({
+    id: "qwen3-1.7b",
+    name: "Qwen3 1.7B Q4",
+    url: "https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf",
+    ramMb: 1584.1,
+    nCtx: 4096,
+    topK: 20,
+    topP: 0.8,
+    thinkingKey: "enable_thinking",
+  }),
+  chatModel({
+    id: "smollm2-1.7b",
+    name: "SmolLM2 1.7B Instruct Q4",
+    url: "https://huggingface.co/unsloth/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q4_K_M.gguf",
+    ramMb: 1854.7,
+    nCtx: 4096,
+  }),
+  chatModel({
+    id: "llama32-3b",
+    name: "Llama 3.2 3B Instruct Q4",
+    url: "https://huggingface.co/unsloth/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+    ramMb: 2453.8,
+    nCtx: 4096,
+  }),
 ];
 
 const wasmUrl = new URL("./vendor/wllama/wllama.wasm", import.meta.url).href;
 
-const badgeEl = document.getElementById("badge");
-const modelNoteEl = document.getElementById("modelNote");
+const deviceMemoryEl = document.getElementById("deviceMemory");
 const modelEl = document.getElementById("model");
 const statusEl = document.getElementById("status");
 const chatEl = document.getElementById("chat");
@@ -64,12 +138,14 @@ const maxTokensEl = document.getElementById("maxTokens");
 const temperatureEl = document.getElementById("temperature");
 const repeatPenaltyEl = document.getElementById("repeatPenalty");
 const thinkingEl = document.getElementById("thinking");
+const chippyEl = document.getElementById("chippy");
+const systemPromptField = document.getElementById("systemPromptField");
+const systemPromptEl = document.getElementById("systemPrompt");
 const ttsEl = document.getElementById("tts");
 const ttsVoiceEl = document.getElementById("ttsVoice");
 const ttsSpeedEl = document.getElementById("ttsSpeed");
 const ttsOutputEl = document.getElementById("ttsOutput");
-const systemPromptEl = document.getElementById("systemPrompt");
-const resetPromptBtn = document.getElementById("resetPrompt");
+const interruptBtn = document.getElementById("interrupt");
 
 let wllama = null;
 const CHATS_KEY = "minimind.chats";
@@ -100,7 +176,7 @@ function defaultSettings(model) {
     maxTokens: model.maxTokens,
     temperature: model.temperature,
     repeatPenalty: model.repeatPenalty,
-    systemPrompt: DEFAULT_SYSTEM,
+    chippy: false,
     thinking: false,
   };
 }
@@ -119,6 +195,7 @@ function readSettings(model) {
         settings = { ...defaults, ...parsed };
       }
     }
+    delete settings.systemPrompt;
     const capKey = `minimind.maxTokensCap.${model.id}`;
     const cap = Number(localStorage.getItem(capKey) || 1024);
     if (model.maxTokens > cap && Number(settings.maxTokens) === cap) {
@@ -132,9 +209,15 @@ function readSettings(model) {
   }
 }
 
+function syncSystemPrompt() {
+  const chippy = chippyEl.checked;
+  systemPromptField.hidden = chippy;
+  if (!chippy) systemPromptEl.value = DEFAULT_SYSTEM;
+}
+
 function systemText() {
-  const text = systemPromptEl.value.trim();
-  return text || DEFAULT_SYSTEM;
+  if (chippyEl.checked) return CHIPPY_SYSTEM;
+  return systemPromptEl.value.trim() || DEFAULT_SYSTEM;
 }
 
 function writeSettings(id = activeId) {
@@ -144,7 +227,7 @@ function writeSettings(id = activeId) {
       maxTokens: Number(maxTokensEl.value),
       temperature: Number(temperatureEl.value),
       repeatPenalty: Number(repeatPenaltyEl.value),
-      systemPrompt: systemPromptEl.value,
+      chippy: chippyEl.checked,
       thinking: thinkingEl.checked,
     })
   );
@@ -153,14 +236,13 @@ function writeSettings(id = activeId) {
 
 function applySettings(model) {
   const settings = readSettings(model);
-  badgeEl.textContent = model.badge;
-  modelNoteEl.hidden = model.id !== "minimind-3";
   maxTokensEl.max = String(model.maxTokens);
   maxTokensEl.value = String(settings.maxTokens);
   temperatureEl.value = String(settings.temperature);
   repeatPenaltyEl.value = String(settings.repeatPenalty);
-  systemPromptEl.value = settings.systemPrompt;
+  chippyEl.checked = Boolean(settings.chippy);
   thinkingEl.checked = Boolean(settings.thinking);
+  syncSystemPrompt();
 }
 
 function setStatus(text, cls = "") {
@@ -217,9 +299,24 @@ function unlockAudio() {
   if (pending) pending.then(() => audio.pause()).catch(() => { audio.dataset.ready = ""; });
 }
 
+function syncInterrupt() {
+  const run = speechRun;
+  interruptBtn.hidden = !(run && !run.cancelled && !run.finished);
+}
+
 function stopSpeech() {
-  if (speechRun) speechRun.cancelled = true;
+  const run = speechRun;
+  if (run && !run.cancelled) {
+    run.cancelled = true;
+    run.closed = true;
+    for (const resolve of run.waiters.splice(0)) resolve(null);
+    const finish = run.finishPlay;
+    run.finishPlay = null;
+    if (finish) finish();
+  }
   if (speechAudio) {
+    speechAudio.onended = null;
+    speechAudio.onerror = null;
     speechAudio.pause();
     speechAudio.removeAttribute("src");
     speechAudio.load();
@@ -228,6 +325,7 @@ function stopSpeech() {
     URL.revokeObjectURL(speechUrl);
     speechUrl = null;
   }
+  syncInterrupt();
 }
 
 function addOutputOption(value, label) {
@@ -280,52 +378,164 @@ async function useOutput(audio) {
 const SMILEY =
   /(?<![\w])(?::['’]-?\(|[:;=8][-^']?[)\]DdpP3/\\(|*]|[)\](/\\][-^']?[:;=8]|<3|<\/3|\^_+\^|>_+<|>\.<|[xX][Dd])(?![\w])/g;
 
-function speechText(raw) {
-  return raw
-    .replace(/<think>[\s\S]*?<\/think>/gi, " ")
-    .replace(/<think>[\s\S]*$/gi, " ")
+const SENTENCE_SPLIT = /(?<=[.!?…])[ \t]+|(?<=[।॥])\s*|\n+/u;
+
+function speechSource(raw) {
+  return String(raw || "")
+    .replace(/<think>[\s\S]*?<\/think>/gi, "\n")
+    .replace(/<think>[\s\S]*$/gi, "\n")
     .replace(/\p{Extended_Pictographic}/gu, " ")
     .replace(/[\u200D\uFE0F\uFE0E]/g, " ")
     .replace(SMILEY, " ")
-    .replace(/\*/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/\*/g, " ");
 }
 
-async function speakReply(raw, myRun) {
-  const text = speechText(raw);
-  if (!text || !ttsEl.checked || myRun !== runId) return;
+function sentenceClosed(text) {
+  return /(?:[.!?…][ \t]+|[।॥]\s*|\n)\s*$/u.test(text);
+}
+
+function takeComplete(text, flush) {
+  const parts = text.split(SENTENCE_SPLIT);
+  const complete = flush || sentenceClosed(text);
+  const count = complete ? parts.length : Math.max(0, parts.length - 1);
+  const ready = [];
+  for (let i = 0; i < count; i++) {
+    const sentence = parts[i].replace(/\s+/g, " ").trim();
+    if (/\p{L}|\p{N}/u.test(sentence)) ready.push(sentence);
+  }
+  return { ready, rest: complete ? "" : parts[parts.length - 1] ?? "" };
+}
+
+function createSpeechRun(myRun) {
   stopSpeech();
-  const run = { cancelled: false };
+  const run = {
+    myRun,
+    cancelled: false,
+    closed: false,
+    finished: false,
+    busy: false,
+    playing: false,
+    queue: [],
+    waiters: [],
+    queued: 0,
+    finishPlay: null,
+  };
   speechRun = run;
+  syncInterrupt();
+  return run;
+}
+
+function enqueueSentence(run, text) {
+  if (!text || run.cancelled || run.closed) return;
+  const resolve = run.waiters.shift();
+  if (resolve) resolve(text);
+  else run.queue.push(text);
+  syncInterrupt();
+}
+
+function closeSpeech(run) {
+  if (!run || run.closed) return;
+  run.closed = true;
+  if (!run.queue.length) {
+    for (const resolve of run.waiters.splice(0)) resolve(null);
+  }
+}
+
+function feedSpeech(run, raw, flush) {
+  if (!run || run.cancelled || run.closed) return;
+  const { ready } = takeComplete(speechSource(raw), flush);
+  while (run.queued < ready.length) {
+    enqueueSentence(run, ready[run.queued]);
+    run.queued += 1;
+  }
+  if (flush) closeSpeech(run);
+}
+
+function nextPiece(run) {
+  if (run.cancelled) return null;
+  if (run.queue.length) return run.queue.shift();
+  if (run.closed) return null;
+  return new Promise((resolve) => run.waiters.push(resolve));
+}
+
+function playBlob(blob, run) {
+  if (run.cancelled) return Promise.resolve();
+  const audio = speechElement();
+  if (speechUrl) URL.revokeObjectURL(speechUrl);
+  speechUrl = URL.createObjectURL(blob);
+  audio.src = speechUrl;
+  run.playing = true;
+  syncInterrupt();
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      audio.onended = null;
+      audio.onerror = null;
+      if (run.finishPlay === done) run.finishPlay = null;
+      run.playing = false;
+      syncInterrupt();
+      resolve();
+    };
+    run.finishPlay = done;
+    audio.onended = done;
+    audio.onerror = done;
+    audio.play().then(() => {
+      if (run.cancelled || !run.playing) return;
+      if (!generating && !statusEl.classList.contains("error")) setStatus("Speaking…");
+    }).catch(done);
+  });
+}
+
+async function speakLoop(run) {
   try {
     if (!speechEngine) {
+      run.busy = true;
+      syncInterrupt();
       speechLoad = speechLoad || loadEngine(({ text: label, progress }) => {
-        if (run.cancelled || myRun !== runId) return;
+        if (run.cancelled || run.myRun !== runId) return;
         setStatus(progress == null ? label : `Speech… ${progress}%`);
       });
       speechEngine = await speechLoad;
+      run.busy = false;
+      if (!run.cancelled && generating && /Loading|Speech|Starting|Downloading/.test(statusEl.textContent)) {
+        setStatus("Generating…");
+      }
     }
-    if (run.cancelled || !ttsEl.checked || myRun !== runId) return;
-    const { blob } = await synthesize(
-      speechEngine,
-      [{ text, voice: ttsVoiceEl.value, speed: Number(ttsSpeedEl.value) || 1 }],
-      null,
-      run
-    );
-    if (run.cancelled || !ttsEl.checked || myRun !== runId) return;
-    const audio = speechElement();
-    await useOutput(audio);
-    if (run.cancelled || !ttsEl.checked || myRun !== runId) return;
-    if (speechUrl) URL.revokeObjectURL(speechUrl);
-    speechUrl = URL.createObjectURL(blob);
-    audio.src = speechUrl;
-    await audio.play();
-    if (!generating) setStatus(`Ready`, "ready");
+    if (run.cancelled || !ttsEl.checked || run.myRun !== runId) return;
+    await useOutput(speechElement());
+    let chain = Promise.resolve();
+    while (!run.cancelled && ttsEl.checked && run.myRun === runId) {
+      const text = await nextPiece(run);
+      if (!text || run.cancelled || !ttsEl.checked) break;
+      run.busy = true;
+      syncInterrupt();
+      const { blob } = await synthesize(
+        speechEngine,
+        [{ text, voice: ttsVoiceEl.value, speed: Number(ttsSpeedEl.value) || 1 }],
+        null,
+        run
+      );
+      run.busy = false;
+      if (run.cancelled || !ttsEl.checked) return;
+      chain = chain.then(() => playBlob(blob, run));
+    }
+    await chain;
   } catch (err) {
     if (run.cancelled || err?.cancelled) return;
     console.error(err);
+    run.cancelled = true;
+    if (run.finishPlay) run.finishPlay();
     setStatus("Speech failed", "error");
+  } finally {
+    run.busy = false;
+    run.finished = true;
+    if (speechRun === run) speechRun = null;
+    syncInterrupt();
+    if (!run.cancelled && !generating && statusEl.textContent === "Speaking…") {
+      setStatus("Ready", "ready");
+    }
   }
 }
 
@@ -570,14 +780,15 @@ function sampling() {
   const maxTokens = Math.min(model.maxTokens, Math.max(16, Number(maxTokensEl.value) || model.maxTokens));
   const temperature = Math.min(2, Math.max(0, Number(temperatureEl.value)));
   const repeatPenalty = Math.min(2, Math.max(1, Number(repeatPenaltyEl.value) || 1));
-  return {
+  const sample = {
     max_tokens: maxTokens,
     temperature: Number.isFinite(temperature) ? temperature : model.temperature,
     top_k: model.topK,
     top_p: model.topP,
     repeat_penalty: Number.isFinite(repeatPenalty) ? repeatPenalty : model.repeatPenalty,
-    chat_template_kwargs: { [model.thinkingKey]: thinkingEl.checked },
   };
+  if (model.thinkingKey) sample.chat_template_kwargs = { [model.thinkingKey]: thinkingEl.checked };
+  return sample;
 }
 
 async function boot(model) {
@@ -605,7 +816,7 @@ async function boot(model) {
     setStatus("Loading WASM…");
     const engine = new Wllama({ default: wasmUrl });
     wllama = engine;
-    setStatus(`Loading ${model.label} (${model.sizeLabel})…`);
+    setStatus(`Loading ${model.name} (${formatRam(model.ramMb)})…`);
     await engine.loadModelFromUrl(model.url, {
       n_ctx: model.nCtx,
       n_batch: 512,
@@ -620,7 +831,7 @@ async function boot(model) {
         if (myLoad !== runId || total <= 0) return;
         const pct = Math.round((loaded / total) * 100);
         progressBar.style.width = pct + "%";
-        setStatus(`Loading… ${pct}%`);
+        setStatus(`Loading ${model.name} (${formatRam(model.ramMb)})… ${pct}%`);
       },
     });
     if (myLoad !== runId || wllama !== engine) {
@@ -680,6 +891,17 @@ async function send() {
   let content = "";
   let reasoning = "";
   let reply = "";
+  let voice = null;
+  const noteSpeech = (raw, flush) => {
+    if (!ttsEl.checked) return;
+    if (voice?.cancelled) return;
+    if (!voice) {
+      if (!takeComplete(speechSource(raw), flush).ready.length) return;
+      voice = createSpeechRun(myRun);
+      void speakLoop(voice);
+    }
+    feedSpeech(voice, raw, flush);
+  };
   generating = true;
   abort = new AbortController();
   sendBtn.disabled = false;
@@ -708,6 +930,7 @@ async function send() {
         if (typeof delta.reasoning_content === "string") reasoning += delta.reasoning_content;
         if (typeof delta.content === "string") content += delta.content;
         if (reasoning || content) paint();
+        noteSpeech(content, false);
       },
     });
     const message = result?.choices?.[0]?.message;
@@ -716,18 +939,20 @@ async function send() {
       if (typeof message.content === "string") content = message.content;
     }
     reply = paint();
+    noteSpeech(content, true);
     if (myRun !== runId) return;
     if (content || reasoning) {
       messages.push({ role: "assistant", content: reply });
-      void speakReply(reply, myRun);
     } else {
       messages.pop();
       assistantDiv.remove();
       dropLastUserBubble();
       addMessage("system", "No reply.");
     }
-    setStatus(`Ready`, "ready");
+    if (voice && !voice.finished && !voice.cancelled) setStatus("Speaking…");
+    else setStatus(`Ready`, "ready");
   } catch (err) {
+    if (voice && !voice.cancelled) stopSpeech();
     if (myRun !== runId) return;
     if (err?.name === "AbortError") {
       if (content || reasoning) messages.push({ role: "assistant", content: reply });
@@ -746,6 +971,7 @@ async function send() {
       setStatus("Generation error", "error");
     }
   } finally {
+    if (myRun === runId && voice && !voice.cancelled && !voice.closed) feedSpeech(voice, content, true);
     if (myRun !== runId) return;
     generating = false;
     abort = null;
@@ -761,6 +987,7 @@ async function send() {
 
 function stop() {
   abort?.abort();
+  stopSpeech();
 }
 
 function clearChat() {
@@ -783,12 +1010,34 @@ function clearChat() {
   }
 }
 
+function formatRam(mb) {
+  if (mb >= 1024) return `~${(mb / 1024).toFixed(1)} GB`;
+  return `~${Math.round(mb / 10) * 10} MB`;
+}
+
+function deviceMemoryGb() {
+  const gb = navigator.deviceMemory;
+  if (typeof gb !== "number" || gb <= 0) return 0;
+  return Math.min(gb, 8);
+}
+
+function optionLabel(model) {
+  const tightAt = deviceMemoryGb() * 1024 * 0.5;
+  const fit = tightAt && model.ramMb > tightAt ? " · tight fit" : "";
+  return `${model.name} · ${formatRam(model.ramMb)}${fit}`;
+}
+
 function fillModels() {
   const saved = localStorage.getItem("minimind.modelId");
+  const gb = deviceMemoryGb();
+  if (gb) {
+    deviceMemoryEl.hidden = false;
+    deviceMemoryEl.textContent = `About ${gb} GB reported. Coarse bucket, capped at 8 GB, not free RAM.`;
+  }
   for (const model of MODELS) {
     const option = document.createElement("option");
     option.value = model.id;
-    option.textContent = model.label;
+    option.textContent = optionLabel(model);
     modelEl.appendChild(option);
   }
   activeId = modelById(saved).id;
@@ -813,18 +1062,21 @@ modelEl.addEventListener("change", () => {
   boot(model);
 });
 
-for (const el of [maxTokensEl, temperatureEl, repeatPenaltyEl, thinkingEl, systemPromptEl]) {
-  el.addEventListener("change", () => writeSettings());
+for (const el of [maxTokensEl, temperatureEl, repeatPenaltyEl, thinkingEl, chippyEl]) {
+  el.addEventListener("change", () => {
+    if (el === chippyEl) syncSystemPrompt();
+    writeSettings();
+  });
 }
-
-resetPromptBtn.addEventListener("click", () => {
-  systemPromptEl.value = DEFAULT_SYSTEM;
-  writeSettings();
-});
 
 sendBtn.addEventListener("click", () => {
   if (generating) stop();
   else send();
+});
+
+interruptBtn.addEventListener("click", () => {
+  stopSpeech();
+  if (!generating) setStatus("Ready", "ready");
 });
 
 inputEl.addEventListener("keydown", (event) => {

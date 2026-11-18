@@ -205,6 +205,8 @@ button.text.danger:hover { color: var(--text); }
   color: var(--muted);
 }
 
+.field[hidden] { display: none; }
+
 .field select { width: 100%; }
 
 .check {
@@ -219,7 +221,7 @@ button.text.danger:hover { color: var(--text); }
   width: 100%;
   min-height: 5.5rem;
   padding: 0.6rem 0.7rem;
-  resize: vertical;
+  resize: none;
   line-height: 1.4;
 }
 
@@ -317,6 +319,21 @@ main {
 }
 
 #input:focus { outline: none; }
+
+#clear,
+#interrupt,
+#send {
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+#clear,
+#interrupt { padding: 0 0.55rem; }
+
+#interrupt[hidden] { display: none; }
 
 .progress-wrap {
   position: absolute;
